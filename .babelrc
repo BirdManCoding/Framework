@@ -1,0 +1,29 @@
+{
+    "presets": [
+        "@babel/preset-env",
+        [
+            "@babel/preset-react",
+            {
+                "runtime": "automatic"
+            }
+        ],
+        "@babel/preset-typescript"
+    ],
+    "plugins": [
+        [
+            "@babel/plugin-transform-react-jsx",
+            {
+              "pragma": "birdScript.createElement",
+              "throwIfNamespace": false
+            }
+        ],
+        [
+            "@babel/plugin-transform-typescript",
+            {
+              "onlyRemoveTypeImports": true,
+              "isTSX": true,
+             "jsxPragma": "birdScript"
+            }
+          ]
+    ]
+}
