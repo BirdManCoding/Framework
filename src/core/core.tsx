@@ -1,19 +1,3 @@
-enum CoreTypes {
-  TEXT_ELEMENT = "text_element"
-}
-
-interface NodeElement {
-  type: NodeType,
-  props: {
-      [prop:string]: any | null,
-      children: NodeChildren
-  }
-}
-
-type NodeType = string
-type NodeChildren = NodeElement[] 
-type NodeProps = {[prop:string]: any} 
-
 
 
 export const birdScript = {
@@ -22,36 +6,57 @@ export const birdScript = {
 }
 
 
-function render(element: NodeElement, container: HTMLElement | Text){
-    const dom = element.type === CoreTypes.TEXT_ELEMENT ? document.createTextNode("") : document.createElement(element.type) as any
+type props = {
+  [prop:string]: any | null,
+  children: DomNodeElement[]
+};
 
-   const isProperty = (key: string) => key !== "children"
-   Object.keys(element.props)
-   .filter(isProperty)
-   .forEach((name: keyof NodeProps) => {
-       dom[name] = element.props[name]
-   })
-
-    element.props.children.forEach(child => render(child, dom))
-    container.appendChild(dom)
+interface DomNodeElement {
+  type: string,
+  props: props
 }
 
-function createElement(type: string, props: NodeProps, ...children: NodeChildren): NodeElement
-function createElement(type: string, props: NodeProps, ...children: NodeChildren){
+interface TextNodeElement {
+  isText: boolean,
+  props: props
+}
+
+function render(element: TextNodeElement | DomNodeElement, container: HTMLElement | Text){
+  let dom: HTMLElement | Text;
+  if("isText" in element){
+    dom = document.createTextNode("")
+  } else {
+    dom = document.createElement(element.type)
+  }
+
+  const isProperty = (key:string) => key !== "children"
+  Object.keys(element.props)
+  .filter(isProperty)
+  .forEach((name: string) => {
+    (dom as any)[name] = element.props[name]
+  })
+  
+  element.props.children.forEach(child => render(child, dom))
+  container.appendChild(dom)
+}
+
+
+function createElement(type: string, props: {} | null, ...children: DomNodeElement[] | string[] ): DomNodeElement
+function createElement(type: string, props: {} | null, ...children: DomNodeElement[] | string[] ){
   return {
-      type,
-      props: {
-          ...props,
-          children: children.map(child => typeof child === "object" ? child : createTextElement(child))
-      }
+    type,
+    props: {
+      ...props,
+      children: children.map(child => typeof child === "object" ? child : createTextElement(child))
+    }
   }
 }
 
-function createTextElement(text: string): NodeElement
+function createTextElement(text: string): TextNodeElement
 function createTextElement(text: string){
   return {
-    type: CoreTypes.TEXT_ELEMENT,
-    props:{
+    isText: true,
+    props: {
       nodeValue: text,
       children: []
     }

@@ -10,5 +10,10 @@ const element = (
 
 birdScript.render(element, root)
 
+//birdScript.createElement("div", {
+//  name: "jenny",
+//  className: "miau"
+//}, birdScript.createElement("h1", null, "wuffwuff"))
+
 
 
